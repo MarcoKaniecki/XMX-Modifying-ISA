@@ -28,6 +28,7 @@ int main()
             // printf("%s\n", piece);
             fprintf(outfile, "%s ", piece);
 
+            // TODO: check if label
             // instr name or label
             if (segment == 0)
             {

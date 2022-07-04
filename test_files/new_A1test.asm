@@ -1,11 +1,11 @@
-;
+ ;
  ; A1 test program
  ; Count number of set and clear bits in Data
  ; Exercise 14 XMX instructions
  ;
  ; ECED 3403
  ; 22 06 07
- ; 
+ ;
  org #FFC0
  STKTOP
  ;
@@ -29,17 +29,18 @@
  ;
  Loop
  cmp #0,R5 ; Finished when R5 is zero
- cex eq,$1,$0 ; 
+ cex eq,$1,$0 ;
  br DoneLoop
  bl Subr
  br Loop
  ;
- DoneLoop
+ DoneLoop WORD #6337 ; THIS IS A COMMENT
  ;
  ; Handle case when MSbit is zero
  ;
  movl #10,R7 ; R7 <- 16 (upper byte should be untouched FFxx)
  sub.b R6,R7 ; R7 <- R7 - R6
+ WORD #6337 ; THIS IS A COMMENT
  ;
  str.b R6,A0,$2 ; Setcount <- R6
  str.b R7,A0,$4 ; Clrcount <- R7
@@ -64,4 +65,3 @@
  swap LR,PC
  ;
  end Start
- 

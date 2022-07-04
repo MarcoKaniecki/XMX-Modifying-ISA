@@ -5,7 +5,7 @@
 ;
 ; ECED 3403
 ; 22 06 07
-; 
+;
 	org	#FFC0
 STKTOP
 ;
@@ -29,17 +29,18 @@ Start
 ;
 Loop
 	cmp	#0,R5		; Finished when R5 is zero
-	cex	eq,$1,$0	; 
+	cex	eq,$1,$0	;
 	br	DoneLoop
 	bl	Subr
 	br	Loop
 ;
-DoneLoop
+DoneLoop    ADDX    A6,A7 ; THIS IS A COMMENT
 ;
 ; Handle case when MSbit is zero
 ;
 	movl	#10,R7		; R7 <- 16 (upper byte should be untouched FFxx)
 	sub.b	R6,R7		; R7 <- R7 - R6
+	ADDX    A6,A7       ; THIS IS A COMMENT
 ;
 	str.b	R6,A0,$2	; Setcount <- R6
 	str.b	R7,A0,$4	; Clrcount <- R7

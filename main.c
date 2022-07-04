@@ -16,6 +16,7 @@ int main()
 
     while (fgets(inrec, MAX_REC_LEN, infile) > 0)
     {
+        TRUNCATE(inrec);  // removes LF
         found_cust_inst = FALSE;
         char *piece = strtok(inrec, "\t ");
 
@@ -23,26 +24,27 @@ int main()
         {
             if (found_cust_inst)
             {
-                char regs[MAX_REC_LEN], comments[MAX_REC_LEN];
+                char regs[MAX_REC_LEN];
 
-                // separate regs from any comments
-                sscanf(piece, "%s\t%128c", regs, comments);
+                sscanf(piece, "%s", regs);
+
                 translate_inst(regs);
 
                 found_cust_inst = FALSE;
-                fprintf(outfile, "%s", comments);
-                break;
+
+                piece = strtok(NULL, "\t ");
+                continue;
             }
 
 
             if (find_cust_inst(piece))
                 found_cust_inst = TRUE;
             else
-                fprintf(outfile, " %s", piece);  // TODO: now everything is offset by 1 whitespace
-
+                fprintf(outfile, "%s ", piece);
 
             piece = strtok(NULL, "\t ");
         }
+        fprintf(outfile, "\n");
     }
 
     fclose(infile);
@@ -76,7 +78,7 @@ void translate_inst(char *registers)
     translated_inst += ((src[1] - '0') << 3);
     translated_inst += (dst[1] - '0');
 
-    fprintf(outfile, "WORD\t#%04X\t", translated_inst);
+    fprintf(outfile, "WORD #%04X", translated_inst);
 }
 
 

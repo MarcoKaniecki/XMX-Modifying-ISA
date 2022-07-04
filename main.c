@@ -17,7 +17,6 @@ int main()
     while (fgets(inrec, MAX_REC_LEN, infile) > 0)
     {
         found_cust_inst = FALSE;
-
         char *piece = strtok(inrec, "\t ");
 
         while (piece != NULL)
@@ -39,9 +38,10 @@ int main()
             if (find_cust_inst(piece))
                 found_cust_inst = TRUE;
             else
-                fprintf(outfile, "%s\t", piece);  // TODO: fix tabbing almost everything
+                fprintf(outfile, " %s", piece);  // TODO: now everything is offset by 1 whitespace
 
-            piece = strtok(NULL, TAB);
+
+            piece = strtok(NULL, "\t ");
         }
     }
 
@@ -65,9 +65,7 @@ void translate_inst(char *registers)
     sscanf(registers, "%[^,],%s", src, dst);
 
     if (src[0] == 'A')
-    {
         translated_inst += (1 << 9);  // set SRA bit
-    }
     else if (src[0] == '$')
         translated_inst += (1 << 7);  // set R/C bit to 1 for constant
 
@@ -78,14 +76,14 @@ void translate_inst(char *registers)
     translated_inst += ((src[1] - '0') << 3);
     translated_inst += (dst[1] - '0');
 
-    fprintf(outfile, "word\t#%04X\t", translated_inst);
+    fprintf(outfile, "WORD\t#%04X\t", translated_inst);
 }
 
 
 int find_cust_inst(char *token)
 {
     for (int i = 0; i < CUST_INST_NUM; i++)
-        if (strcmp(token, new_inst[i]) == 0)
+        if (strcasecmp(token, new_inst[i]) == 0)  // compares while insensitive to lower/upper case
         {
             instr_index = i;
             return TRUE;

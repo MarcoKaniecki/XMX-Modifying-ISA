@@ -15,13 +15,16 @@
 #define REG_LEN 2
 #define TRUE 1
 #define FALSE 0
+#define TRUNCATE(name)  name[strlen(name)-1] = '\0'
 
 FILE *infile;
 FILE *outfile;
 
 int instr_index;
 
-char *new_inst[] = {"ADDX", "SUBX", "CMPX"};
+char *new_inst[] = {"ADDX","ADDX.w","ADDX.b",
+                    "SUBX","SUBX.w","SUBX.b",
+                    "CMPX","CMPX.w","CMPX.b"};
 
 extern int find_cust_inst(char *token);
 extern void translate_inst(char *registers);

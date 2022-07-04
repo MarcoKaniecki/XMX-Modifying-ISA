@@ -40,10 +40,15 @@ DoneLoop    ADDX    A6,A7 ; THIS IS A COMMENT
 ;
 	movl	#10,R7		; R7 <- 16 (upper byte should be untouched FFxx)
 	sub.b	R6,R7		; R7 <- R7 - R6
+;
 	ADDX    A6,A7       ; THIS IS A COMMENT
 	ADDX.b  A6,A7
 	SUBX.w  A6,A7
 	CMPX.b  A6,A7
+;
+    ADDX    $2,R0
+    ADDX    $-1,A0
+;
 ;
 	str.b	R6,A0,$2	; Setcount <- R6
 	str.b	R7,A0,$4	; Clrcount <- R7

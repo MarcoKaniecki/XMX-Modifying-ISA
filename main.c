@@ -54,7 +54,6 @@ int find_cust_inst(char *token)
         if (strcasecmp(token, new_inst[i]) == 0)  // compares while insensitive to lower/upper case
         {
             instr_index = i;
-            printf("found %s\n", new_inst[i]);
             return TRUE;
         }
     return FALSE;
@@ -63,7 +62,7 @@ int find_cust_inst(char *token)
 
 void translate_inst(char *registers)
 {
-    char src[MAX_REC_LEN], dst[MAX_REC_LEN];
+    char src[MAX_REC_LEN], dst[MAX_REC_LEN], src_const[MAX_REC_LEN];
     short translated_inst;
 
     if (instr_index >= ADDX && instr_index <= ADDXb)  // ADDX or ADDX.w or ADDX.b
@@ -76,19 +75,32 @@ void translate_inst(char *registers)
     sscanf(registers, "%[^,],%s", src, dst);
 
     // SRC
-    if (src[0] == 'A')
-        translated_inst += (1 << 9);  // set SRA bit
-    else if (src[0] == '$')
+    if (src[0] == 'A' || src[0] == 'R')  // register
+    {
+        if (src[0] == 'A')
+            translated_inst += (1 << 9);  // set SRA bit
+        translated_inst += ((src[1] - '0') << 3);  // convert ex. char '7' to number 7
+    }
+    else if (src[0] == '$')  // constant
+    {
         translated_inst += (1 << 7);  // set R/C bit to 1 for constant
+        // find register in which const is located
+        sscanf(src, "%*c%s", src_const); // ignore first char which is $
+        int i;
+        for (i = 0; i < NUM_CONST; i++)
+            if (strcmp(src_const, constants[i]) == 0)
+                break;
+        // 'i' now contains the reg number at which the const is located
+        translated_inst += (i << 3);
+    }
+    // TODO: can src receive # values?
 
-    if (dst[0] == 'A')
-        translated_inst += (1 << 8);  // set DRA bit
+    if (dst[0] == 'A' || dst[0] == 'R')
+    {
+        if (dst[0] == 'A')
+            translated_inst += (1 << 8);  // set DRA bit
+        translated_inst += (dst[1] - '0');  // set DDD bits
+    }
 
-    // convert ie. char '7' to number 7
-    translated_inst += ((src[1] - '0') << 3);
-    translated_inst += (dst[1] - '0');
-
-    // check
-
-    fprintf(outfile, "WORD #%04X", translated_inst);
+    fprintf(outfile, "WORD #%04X\t", translated_inst);
 }

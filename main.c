@@ -1,11 +1,12 @@
 #include "mod_ISA.h"
 
-
-
 int main()
 {
     char inrec[MAX_REC_LEN], orig_rec[MAX_REC_LEN];
+    char cust_inst[4];
+    int found_cust_inst;
     unsigned int segment;
+    int temp;
 
     infile = fopen("A1test.asm", "r");
     outfile = fopen("new_A1test.asm", "w");
@@ -18,42 +19,30 @@ int main()
 
     while (fgets(inrec, MAX_REC_LEN, infile) > 0)
     {
-        segment = 0;
-        strcpy(orig_rec, inrec);
+        found_cust_inst = FALSE;
 
-        // ie. ADDX   A0,A0   ; comments
-        char *piece = strtok(inrec, TAB);
+        char *piece = strtok(inrec, "\t ");
+
         while (piece != NULL)
         {
-            // printf("%s\n", piece);
-            fprintf(outfile, "%s ", piece);
-
-            // TODO: check if label
-            // instr name or label
-            if (segment == 0)
+            if (found_cust_inst)
             {
-                if (strcmp(piece, "ADDX") == 0)
-                {
-                    printf("ADDX");
-                }
-                else if (strcmp(piece, "SUBX") == 0)
-                {
-                    printf("SUBX");
-                }
-                else if (strcmp(piece, "CMPX") == 0)
-                {
-                    printf("CMPX");
-                }
-                else
-                {
-                    // TODO: could be label
-                    // TODO: ie. label ADDX A0,A0
-                    fprintf(outfile, "Not new instr, print inrec\n");
-                    fprintf(outfile, "%s", inrec);
-                }
+                char regs[MAX_REC_LEN], comments[MAX_REC_LEN];
 
-                segment++;
+                // separate regs from any comments
+                sscanf(piece, "%s\t%[^\0]", regs, comments);
+                translate_inst(regs);
+
+                found_cust_inst = FALSE;
+                fprintf(outfile, "%s", comments);
+                break;
             }
+
+
+            if (find_cust_inst(piece))
+                found_cust_inst = TRUE;
+            else
+                fprintf(outfile, "%s\t", piece);  // TODO: fix tabbing almost everything
 
             piece = strtok(NULL, TAB);
         }
@@ -61,4 +50,48 @@ int main()
 
     fclose(infile);
     return 0;
+}
+
+
+void translate_inst(char *registers)
+{
+    char src[MAX_REC_LEN], dst[MAX_REC_LEN];
+    short translated_inst;
+
+    if (strcmp(new_inst[instr_index], "ADDX") == 0)
+        translated_inst = 0x6000;
+    else if (strcmp(new_inst[instr_index], "SUBX") == 0)
+        translated_inst = 0x6400;
+    else  // CMPX
+        translated_inst = 0x6800;
+
+    sscanf(registers, "%[^,],%s", src, dst);
+
+    if (src[0] == 'A')
+    {
+        translated_inst += (1 << 9);  // set SRA bit
+    }
+    else if (src[0] == '$')
+        translated_inst += (1 << 7);  // set R/C bit to 1 for constant
+
+    if (dst[0] == 'A')
+        translated_inst += (1 << 8);  // set DRA bit
+
+    // convert ie. char '7' to number 7
+    translated_inst += ((src[1] - '0') << 3);
+    translated_inst += (dst[1] - '0');
+
+    fprintf(outfile, "WORD\t#%04X\t", translated_inst);
+}
+
+
+int find_cust_inst(char *token)
+{
+    for (int i = 0; i < CUST_INST_NUM; i++)
+        if (strcmp(token, new_inst[i]) == 0)
+        {
+            instr_index = i;
+            return TRUE;
+        }
+    return FALSE;
 }

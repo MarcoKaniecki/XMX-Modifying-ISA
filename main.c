@@ -57,15 +57,16 @@ void translate_inst(char *registers)
     char src[MAX_REC_LEN], dst[MAX_REC_LEN];
     short translated_inst;
 
-    if (strcmp(new_inst[instr_index], "ADDX") == 0)
-        translated_inst = 0x6000;
-    else if (strcmp(new_inst[instr_index], "SUBX") == 0)
-        translated_inst = 0x6400;
-    else  // CMPX
-        translated_inst = 0x6800;
+    if (instr_index >= ADDX && instr_index <= ADDXb)  // ADDX or ADDX.w or ADDX.b
+        translated_inst = (instr_index != ADDXb)? 0x6000 : 0x6000 + (1 << 6);  // set W/B bit if byte inst
+    else if (instr_index >= SUBX && instr_index <= SUBXb)  // SUBX or SUBX.w or SUBX.b
+        translated_inst = (instr_index != SUBXb)? 0x6400 : 0x6400 + (1 << 6);  // set W/B bit if byte inst
+    else // CMPX or CMPX.w or CMPX.b
+        translated_inst = (instr_index != CMPXb)? 0x6800 : 0x6800 + (1 << 6);  // set W/B bit if byte inst
 
     sscanf(registers, "%[^,],%s", src, dst);
 
+    // SRC
     if (src[0] == 'A')
         translated_inst += (1 << 9);  // set SRA bit
     else if (src[0] == '$')
@@ -77,6 +78,8 @@ void translate_inst(char *registers)
     // convert ie. char '7' to number 7
     translated_inst += ((src[1] - '0') << 3);
     translated_inst += (dst[1] - '0');
+
+    // check
 
     fprintf(outfile, "WORD #%04X", translated_inst);
 }

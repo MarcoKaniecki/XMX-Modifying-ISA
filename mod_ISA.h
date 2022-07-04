@@ -14,10 +14,15 @@
 #define FALSE 0
 #define TRUNCATE(name)  name[strlen(name)-1] = '\0'
 
+
+
 FILE *infile;
 FILE *outfile;
 
 int instr_index;
+
+enum NEW_INSTR {ADDX, ADDXw, ADDXb, SUBX, SUBXw, SUBXb, CMPX, CMPXw, CMPXb};
+
 
 char *new_inst[] = {"ADDX","ADDX.w","ADDX.b",
                     "SUBX","SUBX.w","SUBX.b",

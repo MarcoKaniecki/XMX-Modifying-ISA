@@ -2,11 +2,8 @@
 
 int main()
 {
-    char inrec[MAX_REC_LEN], orig_rec[MAX_REC_LEN];
-    char cust_inst[4];
+    char inrec[MAX_REC_LEN];
     int found_cust_inst;
-    unsigned int segment;
-    int temp;
 
     infile = fopen("A1test.asm", "r");
     outfile = fopen("new_A1test.asm", "w");
@@ -30,7 +27,7 @@ int main()
                 char regs[MAX_REC_LEN], comments[MAX_REC_LEN];
 
                 // separate regs from any comments
-                sscanf(piece, "%s\t%[^\0]", regs, comments);
+                sscanf(piece, "%s\t%128c", regs, comments);
                 translate_inst(regs);
 
                 found_cust_inst = FALSE;
@@ -81,7 +78,7 @@ void translate_inst(char *registers)
     translated_inst += ((src[1] - '0') << 3);
     translated_inst += (dst[1] - '0');
 
-    fprintf(outfile, "WORD\t#%04X\t", translated_inst);
+    fprintf(outfile, "word\t#%04X\t", translated_inst);
 }
 
 

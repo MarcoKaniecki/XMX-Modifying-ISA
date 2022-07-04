@@ -25,13 +25,9 @@ int main()
             if (found_cust_inst)
             {
                 char regs[MAX_REC_LEN];
-
                 sscanf(piece, "%s", regs);
-
                 translate_inst(regs);
-
                 found_cust_inst = FALSE;
-
                 piece = strtok(NULL, "\t ");
                 continue;
             }
@@ -49,6 +45,19 @@ int main()
 
     fclose(infile);
     return 0;
+}
+
+
+int find_cust_inst(char *token)
+{
+    for (int i = 0; i < CUST_INST_NUM; i++)
+        if (strcasecmp(token, new_inst[i]) == 0)  // compares while insensitive to lower/upper case
+        {
+            instr_index = i;
+            printf("found %s\n", new_inst[i]);
+            return TRUE;
+        }
+    return FALSE;
 }
 
 
@@ -82,16 +91,4 @@ void translate_inst(char *registers)
     // check
 
     fprintf(outfile, "WORD #%04X", translated_inst);
-}
-
-
-int find_cust_inst(char *token)
-{
-    for (int i = 0; i < CUST_INST_NUM; i++)
-        if (strcasecmp(token, new_inst[i]) == 0)  // compares while insensitive to lower/upper case
-        {
-            instr_index = i;
-            return TRUE;
-        }
-    return FALSE;
 }

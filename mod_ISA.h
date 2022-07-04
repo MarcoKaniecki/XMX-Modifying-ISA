@@ -9,7 +9,7 @@
 #include <string.h>
 
 #define MAX_REC_LEN 128
-#define CUST_INST_NUM 3
+#define CUST_INST_NUM 9
 #define TRUE 1
 #define FALSE 0
 #define TRUNCATE(name)  name[strlen(name)-1] = '\0'

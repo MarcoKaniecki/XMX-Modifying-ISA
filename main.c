@@ -47,7 +47,7 @@ int main()
     return 0;
 }
 
-
+// finds
 int find_cust_inst(char *token)
 {
     for (int i = 0; i < CUST_INST_NUM; i++)
@@ -81,8 +81,14 @@ void translate_inst(char *registers)
             translated_inst += (1 << 9);  // set SRA bit
         translated_inst += ((src[1] - '0') << 3);  // convert ex. char '7' to number 7
     }
-    else if (src[0] == '$')  // constant
+    // TODO: can src receive # values?
+    // $ - decimal, # - hex
+    else if (src[0] == '$' || src[0] == '#')  // constant
     {
+        // TODO: convert hex to decimal
+        // if (src[0] == '#')
+
+
         translated_inst += (1 << 7);  // set R/C bit to 1 for constant
         // find register in which const is located
         sscanf(src, "%*c%s", src_const); // ignore first char which is $
@@ -93,7 +99,7 @@ void translate_inst(char *registers)
         // 'i' now contains the reg number at which the const is located
         translated_inst += (i << 3);
     }
-    // TODO: can src receive # values?
+
 
     if (dst[0] == 'A' || dst[0] == 'R')
     {

@@ -78,34 +78,40 @@ void translate_inst(char *registers)
     if (src[0] == 'A' || src[0] == 'R')  // register
     {
         if (src[0] == 'A')
-            translated_inst += (1 << 9);  // set SRA bit
-        translated_inst += ((src[1] - '0') << 3);  // convert ex. char '7' to number 7
+            translated_inst |= (1 << 9);  // set SRA bit
+        translated_inst |= ((src[1] - '0') << 3);  // convert ex. char '7' to number 7
     }
-    // TODO: can src receive # values?
     // $ - decimal, # - hex
     else if (src[0] == '$' || src[0] == '#')  // constant
     {
-        // TODO: convert hex to decimal
-        // if (src[0] == '#')
-
-
-        translated_inst += (1 << 7);  // set R/C bit to 1 for constant
+        translated_inst |= (1 << 7);  // set R/C bit to 1 for constant
         // find register in which const is located
         sscanf(src, "%*c%s", src_const); // ignore first char which is $
+
+        // converts the hex strings to decimal strings
+        // values from 0 to 8 are the same
+        if (src[0] == '#')
+        {
+            if (strcmp(src_const, "10") == 0) { strcpy(src_const, "16"); }
+            if (strcmp(src_const, "20") == 0) { strcpy(src_const, "32"); }
+            if (strcasecmp(src_const, "ff") == 0) { strcpy(src_const, "-1"); }
+        }
+
+        // locate register num in which src_const is located
         int i;
         for (i = 0; i < NUM_CONST; i++)
             if (strcmp(src_const, constants[i]) == 0)
                 break;
         // 'i' now contains the reg number at which the const is located
-        translated_inst += (i << 3);
+        translated_inst |= (i << 3);
     }
 
-
+    // DST
     if (dst[0] == 'A' || dst[0] == 'R')
     {
         if (dst[0] == 'A')
-            translated_inst += (1 << 8);  // set DRA bit
-        translated_inst += (dst[1] - '0');  // set DDD bits
+            translated_inst |= (1 << 8);  // set DRA bit
+        translated_inst |= (dst[1] - '0');  // set DDD bits
     }
 
     fprintf(outfile, "WORD #%04X\t", translated_inst);

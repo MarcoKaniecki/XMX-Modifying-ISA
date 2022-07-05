@@ -49,6 +49,16 @@ DoneLoop    ADDX    A6,A7 ; THIS IS A COMMENT
     ADDX    $2,R0
     ADDX    $-1,A0
 ;
+    ADDX    #20,A0
+    ADDX    $32,A0
+;
+    ADDX    #8,A0
+    ADDX    $8,A0
+;
+    ADDX    #FF,A0
+    ADDX    $-1,A0
+;
+;
 ;
 	str.b	R6,A0,$2	; Setcount <- R6
 	str.b	R7,A0,$4	; Clrcount <- R7

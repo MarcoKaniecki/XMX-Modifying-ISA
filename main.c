@@ -5,6 +5,7 @@ int main()
     char inrec[MAX_REC_LEN];
     int found_cust_inst;
 
+    // TODO: change so program asks user for input filename
     infile = fopen("A1test.asm", "r");
     outfile = fopen("new_A1test.asm", "w");
 
@@ -14,6 +15,11 @@ int main()
         return -1;
     }
 
+    // preprocessor
+    // goes through file, line by line, looks for new instr
+    // if new instr is found such as ADDX, a variable is set such that in the next iteration (inner while loop)
+    // the registers such as A0,R7 are read and passed to the translation function
+    // if no new instr is found then just print to outfile
     while (fgets(inrec, MAX_REC_LEN, infile) > 0)
     {
         TRUNCATE(inrec);  // removes LF
@@ -25,16 +31,15 @@ int main()
             if (found_cust_inst)
             {
                 char regs[MAX_REC_LEN];
-                sscanf(piece, "%s", regs);
+                sscanf(piece, "%s", regs);  // extract regs such as > A0,R1 <
                 translate_inst(regs);
-                found_cust_inst = FALSE;
+                found_cust_inst = FALSE;  // reset for next line
                 piece = strtok(NULL, "\t ");
                 continue;
             }
-
-
+            // check if piece is a new instr
             if (find_cust_inst(piece))
-                found_cust_inst = TRUE;
+                found_cust_inst = TRUE;  // set to true so value of next piece will get extracted and passed to translator
             else
                 fprintf(outfile, "%s ", piece);
 
@@ -42,12 +47,11 @@ int main()
         }
         fprintf(outfile, "\n");
     }
-
     fclose(infile);
     return 0;
 }
 
-// finds
+// looks if token/piece is one of the new instructions
 int find_cust_inst(char *token)
 {
     for (int i = 0; i < CUST_INST_NUM; i++)
@@ -59,7 +63,8 @@ int find_cust_inst(char *token)
     return FALSE;
 }
 
-
+// translates instructions such as ADDX R0,A0 to an opcode + operands
+// prints translated value to outfile, in turn replacing the ex. ADDX R0,A0 with its corresponding opcode + operands
 void translate_inst(char *registers)
 {
     char src[MAX_REC_LEN], dst[MAX_REC_LEN], src_const[MAX_REC_LEN];

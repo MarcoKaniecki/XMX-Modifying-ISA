@@ -2,16 +2,27 @@
 
 int main()
 {
-    char inrec[MAX_REC_LEN];
+    char inrec[MAX_REC_LEN], infilename[MAX_REC_LEN], outfilename[MAX_REC_LEN] = "new_";
     int found_cust_inst;
 
-    // TODO: change so program asks user for input filename
-    infile = fopen("A1test.asm", "r");
-    outfile = fopen("new_A1test.asm", "w");
+    // get filename from user and open input file
+    printf("Enter filename\n");
+    printf("> ");
+    scanf("%s", infilename);
 
+    if (fopen(infilename, "r") == 0)
+    {
+        printf("Error opening >%s<\n", infilename);
+        return -1;
+    }
+    infile = fopen(infilename, "r");
+
+    // create output file which is the infilename with new_ in-front of it
+    strcat(outfilename, infilename);
+    outfile = fopen(outfilename, "w");
     if (outfile == NULL)
     {
-        printf("Error opening outfile!\n");
+        printf("Error opening >%s<\n", outfilename);
         return -1;
     }
 
